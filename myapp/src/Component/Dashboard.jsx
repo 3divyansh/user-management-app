@@ -91,7 +91,7 @@ const Dashboard = () => {
   return (
     <div className="flex flex-col lg:flex-row h-auto bg-gradient-to-r from-blue-500 via-teal-500 to-purple-600 text-white">
       {/* Sidebar */}
-      <aside className="w-full lg:w-80 shadow-xl p-6 lg:h-screen">
+      <aside className="w-full lg:w-80 shadow-xl p-6 lg:h-fit">
         <h2 className="text-3xl font-bold flex items-center gap-3">
           <ListTodo size={32} />
           <span className="text-2xl font-semibold">User Management</span>

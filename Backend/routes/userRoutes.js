@@ -1,6 +1,6 @@
 const express = require("express");
 const multer = require("multer");
-const bcrypt = require("bcrypt");
+const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
 const User = require("../models/Users");
 const users = require("../models/Dashboard");
@@ -39,14 +39,13 @@ router.post('/signup', upload.single('photo'), async (req, res) => {
     }
 
     // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
+   
     // Create user without manually setting the `id`
     const user = new User({
       name,
       phone,
       email,
-      password: hashedPassword,  // Store hashed password
+      password, // Store hashed password
       photo: photoPath,  // Store photo path
     });
 
@@ -63,23 +62,61 @@ router.post('/signup', upload.single('photo'), async (req, res) => {
 });
 
 // Login Route
+// router.post('/login', async (req, res) => {
+//   const { email, password } = req.body;
+//   console.log("Received Login Request:", email, password);
+
+//   try {
+//     const user = await User.findOne({ email });
+//     console.log("User Found:", user);
+
+//     if (!user) return res.status(400).json({ message: 'Invalid credentials' });
+//     console.log("Entered Password:", password);
+//     console.log("Type of Entered Password:", typeof password);
+//     console.log("Stored Hashed Password:", user.password);
+//     console.log("Type of Stored Password:", typeof user.password);
+    
+
+//     const isMatch = await bcrypt.compare(String(password), user.password);
+
+//     console.log("Password Match Result:", isMatch);
+
+//     if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+
+//     const token = jwt.sign({ id: user._id }, 'secretkey', { expiresIn: '1h' });
+//     res.status(200).json({ success: true, token });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: 'Server Error' });
+//   }
+// });
+
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
+  console.log("Received Login Request:", email, password);
 
   try {
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: 'Invalid credentials' });
+      const user = await User.findOne({ email });
+      console.log("User Found:", user);
 
-    const isMatch = await user.matchPassword(password);
-    if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+      if (!user) return res.status(400).json({ message: 'Invalid credentials' });
 
-    const token = jwt.sign({ id: user._id }, 'secretkey', { expiresIn: '1h' });
-    res.status(200).json({ success: true, token });
+      console.log("Entered Password:", password);
+      console.log("Stored Password:", user.password);
+
+      // ✅ Direct password match
+      if (password !== user.password) {
+          return res.status(400).json({ message: 'Invalid credentials' });
+      }
+
+      const token = jwt.sign({ id: user._id }, 'secretkey', { expiresIn: '1h' });
+      res.status(200).json({ success: true, token });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server Error' });
+      console.error(err);
+      res.status(500).json({ message: 'Server Error' });
   }
 });
+
 
 // Get user data
 router.post("/user", async (req, res) => {
